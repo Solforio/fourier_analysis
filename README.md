@@ -117,3 +117,15 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 - Consolidated navigation into 4 main tabs: Overview, Frequency & Reconstruction, Components & Residuals, Exports.
 - Optimized sidebar with grouped sections and advanced settings inside expanders.
 - Preserved residual diagnostics, initial period selection, and large-series downsampling.
+
+
+## V4.4.3 features
+
+- Removed the redundant Analysis scope control from the sidebar and placed it in the main homepage analysis window.
+- Reordered the Components & Residuals workspace so component plots come first, followed by the local window settings and then the window charts they modify.
+
+
+## V4.4.4 features
+
+- Removed the redundant Analysis scope selector from the main page because the period selector already covers full series, custom range, and single-year analysis.
+- Restored and highlighted the Temporal components window settings directly under the two decomposition charts and immediately before the window charts they control.

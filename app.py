@@ -372,9 +372,6 @@ with st.sidebar:
     sidebar_block('Data source')
     uploaded_file = st.file_uploader('Upload CSV or XLSX', type=['csv', 'xlsx'])
     unit = st.selectbox('Value unit', ['kW', 'MW', 'GW'], index=0, key='sidebar_unit')
-    analysis_scope = st.segmented_control('Analysis scope', ['Global', 'Annual'], default='Global', key='sidebar_scope')
-    if analysis_scope is None:
-        analysis_scope = 'Global'
 
     sidebar_block('Preparation')
     resample_rule = st.selectbox('Resample for analysis', ['None', '15min', '30min', '1h'], index=0, key='sidebar_resample')
@@ -455,6 +452,7 @@ with period_col3:
     min_date = full_series.index.min().date()
     max_date = full_series.index.max().date()
     selected_range = st.date_input('Custom date range', value=(min_date, max_date), min_value=min_date, max_value=max_date, key='initial_date_range', disabled=(period_mode != 'Custom date range'))
+analysis_scope = 'Global'
 
 if isinstance(selected_range, tuple) and len(selected_range) == 2:
     start_date, end_date = selected_range
@@ -762,6 +760,12 @@ else:
         st.write(component_notes['summary'])
         if rounded_component_cols:
             st.info(f'Low-frequency display rounding applied for readability on: {", ".join(rounded_component_cols)} (display only, exports keep original values).')
+        st.markdown('#### Temporal components decomposition')
+        st.plotly_chart(fig_components, use_container_width=True, key=chart_key('global', 'components'))
+        st.markdown('#### Variance share by temporal component')
+        st.plotly_chart(fig_component_energy, use_container_width=True, key=chart_key('global', 'component_energy'))
+        st.markdown('#### Temporal components window settings')
+        st.caption('These controls affect only the window charts shown immediately below.')
         cwin1, cwin2, cwin3 = st.columns(3)
         with cwin1:
             window_mode = st.radio('Window chart mode', ['overlay', 'stacked'], horizontal=True, index=0, key='global_window_mode')
@@ -776,11 +780,10 @@ else:
         if start_max_ts < component_plot_df.index.min():
             start_max_ts = component_plot_df.index.min()
         selected_start = st.slider('Window start', min_value=start_min, max_value=start_max_ts.to_pydatetime(), value=start_min, format='YYYY-MM-DD HH:mm', key='global_window_start')
-        fig_component_window = build_component_window_figure(component_df=component_plot_df, unit=unit, start_ts=selected_start, horizon_label=horizon_label, mode=window_mode, show_original=show_original)
         show_cumulative_lines = st.checkbox('Show cumulative boundary lines', value=False, key='global_show_cumulative_lines')
+        fig_component_window = build_component_window_figure(component_df=component_plot_df, unit=unit, start_ts=selected_start, horizon_label=horizon_label, mode=window_mode, show_original=show_original)
         fig_cumulative_components = build_cumulative_components_figure(component_df=component_plot_df, unit=unit, start_ts=selected_start, horizon_label=horizon_label, show_original=show_original, show_cumulative_lines=show_cumulative_lines)
-        st.plotly_chart(fig_components, use_container_width=True, key=chart_key('global', 'components'))
-        st.plotly_chart(fig_component_energy, use_container_width=True, key=chart_key('global', 'component_energy'))
+        st.markdown('#### Temporal components window')
         st.plotly_chart(fig_component_window, use_container_width=True, key=chart_key('global', 'component_window'))
         st.plotly_chart(fig_cumulative_components, use_container_width=True, key=chart_key('global', 'component_cumulative'))
         st.markdown('#### Residual diagnostics')
